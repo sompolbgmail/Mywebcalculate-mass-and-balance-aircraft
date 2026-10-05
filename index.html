@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircraft Mass & Balance Calculator - Main Portal</title>
+    <style>
+        :root {
+            --navy-dark: #0f172a;
+            --navy-mid: #1e293b;
+            --accent-blue: #0284c7;
+            --accent-hover: #0369a1;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--navy-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            padding: 32px 28px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--accent-blue);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: var(--navy-dark);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .link-card {
+            background: var(--bg-light);
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .link-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(2, 132, 199, 0.15);
+            background: #f0f9ff;
+        }
+
+        .card-tag {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--navy-dark);
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .card-btn {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .link-card:hover .card-btn {
+            background-color: var(--accent-hover);
+        }
+
+        .footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="header">
+        <h1>Aircraft Mass & Balance Calculator</h1>
+        <p>Flight Training Center of Gravity Manifest Portal (Offline Ready)</p>
+    </div>
+
+    <div class="links-grid">
+        <!-- Aircraft 1: HS-IFE -->
+        <a href="BE76_-HSIFE-_mass_balance_calculator-OK.html" target="_blank" class="link-card">
+            <div>
+                <div class="card-tag">BE76 Duchess</div>
+                <div class="card-title">HS-IFE</div>
+                <div class="card-desc">Multi-Engine Flight Training & Center of Gravity Manifest Calculator</div>
+            </div>
+            <div class="card-btn">
+                Open Calculator
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </div>
+        </a>
+
+        <!-- Aircraft 2: HS-IFC -->
+        <a href="C_172N_-HSIFC-mass_balance_calculator-OK.html" target="_blank" class="link-card">
+            <div>
+                <div class="card-tag">Cessna C-172N</div>
+                <div class="card-title">HS-IFC</div>
+                <div class="card-desc">Flight Student Training & Center of Gravity Manifest Calculator</div>
+            </div>
+            <div class="card-btn">
+                Open Calculator
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </div>
+        </a>
+
+        <!-- Aircraft 3: HS-IFD -->
+        <a href="C_172s_-HSIFD-mass_balance_calculator-OK.html" target="_blank" class="link-card">
+            <div>
+                <div class="card-tag">Cessna C-172S</div>
+                <div class="card-title">HS-IFD</div>
+                <div class="card-desc">Aviation Flight Student Training Mass and Balance Calculator</div>
+            </div>
+            <div class="card-btn">
+                Open Calculator
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </div>
+        </a>
+
+        <!-- Aircraft 4: HS-IFF -->
+        <a href="C_172s_-HSIFF-mass_balance_calculator-OK.html" target="_blank" class="link-card">
+            <div>
+                <div class="card-tag">Cessna C-172S</div>
+                <div class="card-title">HS-IFF</div>
+                <div class="card-desc">Flight Student Training & Center of Gravity Manifest Calculator</div>
+            </div>
+            <div class="card-btn">
+                Open Calculator
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </div>
+        </a>
+
+        <!-- Aircraft 5: HS-IFA -->
+        <a href="C-172M-HSIFA-mass_balance-calculator-OK_2.html" target="_blank" class="link-card">
+            <div>
+                <div class="card-tag">Cessna C-172M</div>
+                <div class="card-title">HS-IFA</div>
+                <div class="card-desc">Flight Training Center Mass and Balance Calculator</div>
+            </div>
+            <div class="card-btn">
+                Open Calculator
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </div>
+        </a>
+    </div>
+
+    <div class="footer">
+        Designed for Local Computer Offline Flight Training Operation • Student Pilots & Flight Instructors
+    </div>
+</div>
+
+</body>
+</html>

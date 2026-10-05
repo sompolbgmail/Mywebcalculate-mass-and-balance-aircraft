@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cessna C-172N HS-IFC Mass & Balance Calculator</title>
+    <style>
+        :root {
+            --primary-navy: #0f172a;
+            --accent-blue: #0284c7;
+            --border-color: #cbd5e1;
+            --bg-dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --success-bg: #dcfce7;
+            --success-border: #86efac;
+            --success-text: #15803d;
+            --danger-bg: #fee2e2;
+            --danger-border: #fca5a5;
+            --danger-text: #b91c1c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* Container designed strictly for single A4 print layout */
+        .a4-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Header Layout */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2.5px solid var(--accent-blue);
+            padding-bottom: 6px;
+        }
+
+        .header-title h1 {
+            font-size: 17px;
+            color: var(--primary-navy);
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .header-title p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-reg {
+            background: #e0f2fe;
+            color: var(--accent-blue);
+            font-weight: 800;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid #bae6fd;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-pdf {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.15s ease;
+        }
+
+        .btn-pdf:hover {
+            background-color: #0369a1;
+        }
+
+        /* Manifest Inputs */
+        .flight-info-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            background-color: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-cell {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-cell label {
+            font-size: 8.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .info-cell input {
+            padding: 3px 5px;
+            font-size: 10.5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-weight: 600;
+            outline: none;
+            color: var(--primary-navy);
+            background: #ffffff;
+        }
+
+        .info-cell input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* Mass & Balance Table */
+        .table-wrap {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10.5px;
+        }
+
+        th {
+            background: var(--primary-navy);
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 0.3px;
+            padding: 5px 8px;
+            text-align: left;
+        }
+
+        th.right, td.right {
+            text-align: right;
+        }
+
+        td {
+            padding: 3.5px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+
+        .item-label {
+            font-weight: 600;
+            color: var(--primary-navy);
+        }
+
+        .input-num {
+            width: 60px;
+            padding: 2px 4px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 10.5px;
+            color: var(--primary-navy);
+            background: #ffffff;
+        }
+
+        .input-num:focus {
+            border-color: var(--accent-blue);
+            background-color: #f0f9ff;
+            outline: none;
+        }
+
+        .readonly-val {
+            color: #475569;
+            font-weight: 600;
+        }
+
+        /* Summary Total & CG Highlight Rows */
+        tr.row-total td {
+            background-color: var(--primary-navy);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 11px;
+            border-bottom: none;
+        }
+
+        tr.row-cg td {
+            background-color: #1e293b;
+            color: #38bdf8;
+            font-weight: 800;
+            font-size: 11.5px;
+            border-bottom: none;
+        }
+
+        .val-highlight {
+            color: #38bdf8;
+            font-weight: 800;
+        }
+
+        /* Envelope Diagram & Status Box */
+        .chart-summary-grid {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .chart-box {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart-box h3 {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--primary-navy);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            align-self: flex-start;
+        }
+
+        #cgCanvas {
+            width: 100%;
+            height: 180px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .summary-side {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .status-card {
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid;
+            text-align: center;
+        }
+
+        .status-card.status-safe {
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+        }
+
+        .status-card.status-danger {
+            background-color: var(--danger-bg);
+            border-color: var(--danger-border);
+            color: var(--danger-text);
+        }
+
+        .status-hdr {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+
+        .status-msg {
+            font-size: 12.5px;
+            font-weight: 900;
+            margin-top: 1px;
+        }
+
+        .limits-table {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            font-size: 9.5px;
+        }
+
+        .limits-table th {
+            background: #f1f5f9;
+            color: var(--primary-navy);
+            font-size: 8.5px;
+            padding: 3.5px 5px;
+        }
+
+        .limits-table td {
+            padding: 3px 5px;
+            font-weight: 600;
+        }
+
+        /* Signatures block */
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 2px;
+            padding-top: 4px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .sig-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sig-line {
+            border-bottom: 1px solid var(--primary-navy);
+            height: 14px;
+        }
+
+        .sig-title {
+            font-size: 8.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Print Media Styles for 1-Page A4 */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 5mm 6mm;
+            }
+
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+
+            .a4-container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+                gap: 5px;
+            }
+
+            .btn-pdf {
+                display: none !important;
+            }
+
+            input {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                font-size: 9.5px !important;
+            }
+
+            .input-num {
+                text-align: right;
+            }
+
+            #cgCanvas {
+                height: 165px !important;
+            }
+
+            table {
+                font-size: 9.5px;
+            }
+
+            td, th {
+                padding: 2.5px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="a4-container">
+    <div class="header">
+        <div class="header-title">
+            <h1>Cessna C-172N Mass & Balance Calculation Sheet</h1>
+            <p>Flight Student Training & Center of Gravity Manifest</p>
+        </div>
+        <div class="header-actions">
+            <span class="badge-reg">Reg: HS-IFC</span>
+            <button class="btn-pdf" onclick="window.print()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Save to PDF / Print A4
+            </button>
+        </div>
+    </div>
+
+    <!-- Flight Information Manifest -->
+    <div class="flight-info-grid">
+        <div class="info-cell">
+            <label>Flight No.</label>
+            <input type="text" id="flightNo" value="IFC-01">
+        </div>
+        <div class="info-cell">
+            <label>Route</label>
+            <input type="text" id="flightRoute" value="VTBD - VTBU">
+        </div>
+        <div class="info-cell">
+            <label>Date</label>
+            <input type="date" id="flightDate">
+        </div>
+        <div class="info-cell">
+            <label>Student Pilot</label>
+            <input type="text" id="studentName" value="Student Pilot">
+        </div>
+        <div class="info-cell">
+            <label>Flight Instructor</label>
+            <input type="text" id="instructorName" value="Capt. Instructor">
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 32%;">Item Description</th>
+                    <th class="right" style="width: 16%;">Input Value</th>
+                    <th class="right" style="width: 16%;">Weight (lbs)</th>
+                    <th class="right" style="width: 12%;">Arm (in)</th>
+                    <th class="right" style="width: 24%;">Moment (lb-in)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 1. Basic Empty Weight -->
+                <tr>
+                    <td class="item-label">Basic Empty Weight</td>
+                    <td class="right readonly-val">-</td>
+                    <td class="right readonly-val">1,449.0</td>
+                    <td class="right readonly-val">41.10</td>
+                    <td class="right readonly-val">59,553.9</td>
+                </tr>
+                <!-- 2. Pilot -->
+                <tr>
+                    <td class="item-label">Pilot</td>
+                    <td class="right"><input type="number" id="input_pilot" class="input-num" value="80" step="0.1" min="0" oninput="calculateC172N()"> <span style="font-size:8.5px; color:var(--text-muted)">kg</span></td>
+                    <td class="right readonly-val" id="lbl_pilot_lbs">176.0</td>
+                    <td class="right readonly-val">37.00</td>
+                    <td class="right readonly-val" id="lbl_pilot_moment">6,512.0</td>
+                </tr>
+                <!-- 3. Co-Pilot -->
+                <tr>
+                    <td class="item-label">Co-Pilot</td>
+                    <td class="right"><input type="number" id="input_copilot" class="input-num" value="70" step="0.1" min="0" oninput="calculateC172N()"> <span style="font-size:8.5px; color:var(--text-muted)">kg</span></td>
+                    <td class="right readonly-val" id="lbl_copilot_lbs">154.0</td>
+                    <td class="right readonly-val">37.00</td>
+                    <td class="right readonly-val" id="lbl_copilot_moment">5,698.0</td>
+                </tr>
+                <!-- 4. Rear Seat -->
+                <tr>
+                    <td class="item-label">Rear Seat</td>
+                    <td class="right"><input type="number" id="input_rear1" class="input-num" value="47" step="0.1" min="0" oninput="calculateC172N()"> <span style="font-size:8.5px; color:var(--text-muted)">kg</span></td>
+                    <td class="right readonly-val" id="lbl_rear1_lbs">103.4</td>
+                    <td class="right readonly-val">73.00</td>
+                    <td class="right readonly-val" id="lbl_rear1_moment">7,548.2</td>
+                </tr>
+                <!-- 5. Rear Seat -->
+                <tr>
+                    <td class="item-label">Rear Seat</td>
+                    <td class="right"><input type="number" id="input_rear2" class="input-num" value="0" step="0.1" min="0" oninput="calculateC172N()"> <span style="font-size:8.5px; color:var(--text-muted)">kg</span></td>
+                    <td class="right readonly-val" id="lbl_rear2_lbs">0.0</td>
+                    <td class="right readonly-val">73.00</td>
+                    <td class="right readonly-val" id="lbl_rear2_moment">0.0</td>
+                </tr>
+                <!-- 6. Baggage Area 1 -->
+                <tr>
+                    <td class="item-label">Baggage Area 1 (Max 120 lbs)</td>
+                    <td class="right"><input type="number" id="input_bag1" class="input-num" value="10" step="0.1" min="0" oninput="calculateC172N()"> <span style="font-size:8.5px; color:var(--text-muted)">kg</span></td>
+                    <td class="right readonly-val" id="lbl_bag1_lbs">22.0</td>
+                    <td class="right readonly-val">95.00</td>
+                    <td class="right readonly-val" id="lbl_bag1_moment">2,090.0</td>
+                </tr>
+                <!-- 7. Baggage Area 2 -->
+                <tr>
+                    <td class="item-label">Baggage Area 2 (Max 50 lbs)</td>
+                    <td class="right"><input type="number" id="input_bag2" class="input-num" value="0" step="0.1" min="0" oninput="calculateC172N()"> <span style="font-size:8.5px; color:var(--text-muted)">kg</span></td>
+                    <td class="right readonly-val" id="lbl_bag2_lbs">0.0</td>
+                    <td class="right readonly-val">123.00</td>
+                    <td class="right readonly-val" id="lbl_bag2_moment">0.0</td>
+                </tr>
+                <!-- 8. Usable Fuel -->
+                <tr>
+                    <td class="item-label">Usable Fuel</td>
+                    <td class="right"><input type="number" id="input_fuel" class="input-num" value="38" step="1" min="0" max="50" oninput="calculateC172N()"> <span style="font-size:8.5px; color:var(--text-muted)">Gal</span></td>
+                    <td class="right readonly-val" id="lbl_fuel_lbs">228.0</td>
+                    <td class="right readonly-val">47.90</td>
+                    <td class="right readonly-val" id="lbl_fuel_moment">10,921.2</td>
+                </tr>
+                <!-- 9. Total Row -->
+                <tr class="row-total">
+                    <td>TOTAL LOADED AIRCRAFT</td>
+                    <td class="right">-</td>
+                    <td class="right val-highlight" id="lbl_total_weight">2,132.4 lbs</td>
+                    <td class="right">-</td>
+                    <td class="right val-highlight" id="lbl_total_moment">92,423.3 lb-in</td>
+                </tr>
+                <!-- 10. CG Row -->
+                <tr class="row-cg">
+                    <td>CENTER OF GRAVITY (CG)</td>
+                    <td class="right">-</td>
+                    <td class="right" colspan="2" style="text-align: right; color:#93c5fd;">CG Position (Inches Aft Datum):</td>
+                    <td class="right val-highlight" id="lbl_total_cg" style="font-size: 12.5px;">43.34 in</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chart-summary-grid">
+        <div class="chart-box">
+            <h3>Cessna C-172N (HS-IFC) Center of Gravity Envelope</h3>
+            <canvas id="cgCanvas" width="400" height="180"></canvas>
+        </div>
+
+        <div class="summary-side">
+            <div id="statusCard" class="status-card status-safe">
+                <div class="status-hdr">Mass & Balance Status</div>
+                <div id="statusText" class="status-msg">WITHIN LIMITS</div>
+            </div>
+
+            <table class="limits-table">
+                <thead>
+                    <tr>
+                        <th>Limitation Item</th>
+                        <th class="right">Max Limit</th>
+                        <th class="right">Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Max Ramp / Takeoff Weight</td>
+                        <td class="right">2,300.0 lbs</td>
+                        <td class="right" id="lim_tow_act">2,132.4 lbs</td>
+                    </tr>
+                    <tr>
+                        <td>Forward CG Limit</td>
+                        <td class="right" id="lim_fwd_val">37.08 in</td>
+                        <td class="right" id="lim_fwd_act">43.34 in</td>
+                    </tr>
+                    <tr>
+                        <td>Aft CG Limit</td>
+                        <td class="right">47.30 in</td>
+                        <td class="right" id="lim_aft_act">43.34 in</td>
+                    </tr>
+                    <tr>
+                        <td>Total Baggage Area 1+2</td>
+                        <td class="right">120.0 lbs</td>
+                        <td class="right" id="lim_bag_act">22.0 lbs</td>
+                    </tr>
+                    <tr>
+                        <td>Category Status</td>
+                        <td class="right" colspan="2" id="lim_category" style="color:var(--accent-blue); font-weight:800; text-align:center;">Normal Category</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Signatures Footer -->
+    <div class="signatures">
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div class="sig-title">Student Pilot Signature / Date</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line"></div>
+            <div class="sig-title">Flight Instructor Signature / Date</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BEW_W = 1449.0;
+    const BEW_ARM = 41.1;
+    const BEW_MOM = 59553.9;
+
+    window.onload = function() {
+        const dateInput = document.getElementById('flightDate');
+        dateInput.value = new Date().toISOString().split('T')[0];
+        calculateC172N();
+    };
+
+    function calculateC172N() {
+        // Read input values
+        const kgPilot = parseFloat(document.getElementById('input_pilot').value) || 0;
+        const kgCopilot = parseFloat(document.getElementById('input_copilot').value) || 0;
+        const kgRear1 = parseFloat(document.getElementById('input_rear1').value) || 0;
+        const kgRear2 = parseFloat(document.getElementById('input_rear2').value) || 0;
+        const kgBag1 = parseFloat(document.getElementById('input_bag1').value) || 0;
+        const kgBag2 = parseFloat(document.getElementById('input_bag2').value) || 0;
+        const galFuel = parseFloat(document.getElementById('input_fuel').value) || 0;
+
+        // Conversions according to Excel rules: kg * 2.2 = lbs
+        const lbsPilot = kgPilot * 2.2;
+        const lbsCopilot = kgCopilot * 2.2;
+        const lbsRear1 = kgRear1 * 2.2;
+        const lbsRear2 = kgRear2 * 2.2;
+        const lbsBag1 = kgBag1 * 2.2;
+        const lbsBag2 = kgBag2 * 2.2;
+        const lbsFuel = galFuel * 6.0; // 6 lbs/gal for AVGAS
+
+        // Moments = Weight * Arm
+        const momPilot = lbsPilot * 37.0;
+        const momCopilot = lbsCopilot * 37.0;
+        const momRear1 = lbsRear1 * 73.0;
+        const momRear2 = lbsRear2 * 73.0;
+        const momBag1 = lbsBag1 * 95.0;
+        const momBag2 = lbsBag2 * 123.0;
+        const momFuel = lbsFuel * 47.9;
+
+        // SUM(E4:E11) and SUM(H4:H11)
+        const totalWeight = BEW_W + lbsPilot + lbsCopilot + lbsRear1 + lbsRear2 + lbsBag1 + lbsBag2 + lbsFuel;
+        const totalMoment = BEW_MOM + momPilot + momCopilot + momRear1 + momRear2 + momBag1 + momBag2 + momFuel;
+        const totalCG = totalWeight > 0 ? (totalMoment / totalWeight) : 0;
+
+        // Render calculated table values
+        document.getElementById('lbl_pilot_lbs').innerText = lbsPilot.toFixed(1);
+        document.getElementById('lbl_pilot_moment').innerText = momPilot.toFixed(1);
+
+        document.getElementById('lbl_copilot_lbs').innerText = lbsCopilot.toFixed(1);
+        document.getElementById('lbl_copilot_moment').innerText = momCopilot.toFixed(1);
+
+        document.getElementById('lbl_rear1_lbs').innerText = lbsRear1.toFixed(1);
+        document.getElementById('lbl_rear1_moment').innerText = momRear1.toFixed(1);
+
+        document.getElementById('lbl_rear2_lbs').innerText = lbsRear2.toFixed(1);
+        document.getElementById('lbl_rear2_moment').innerText = momRear2.toFixed(1);
+
+        document.getElementById('lbl_bag1_lbs').innerText = lbsBag1.toFixed(1);
+        document.getElementById('lbl_bag1_moment').innerText = momBag1.toFixed(1);
+
+        document.getElementById('lbl_bag2_lbs').innerText = lbsBag2.toFixed(1);
+        document.getElementById('lbl_bag2_moment').innerText = momBag2.toFixed(1);
+
+        document.getElementById('lbl_fuel_lbs').innerText = lbsFuel.toFixed(1);
+        document.getElementById('lbl_fuel_moment').innerText = momFuel.toFixed(1);
+
+        document.getElementById('lbl_total_weight').innerText = totalWeight.toFixed(1) + ' lbs';
+        document.getElementById('lbl_total_moment').innerText = totalMoment.toFixed(1) + ' lb-in';
+        document.getElementById('lbl_total_cg').innerText = totalCG.toFixed(2) + ' in';
+
+        // C-172N Forward CG Limit interpolation:
+        // 35.0 in at 1,500 lbs sloped to 38.5 in at 2,300 lbs
+        let fwdLimit = 35.0;
+        if (totalWeight <= 1500) {
+            fwdLimit = 35.0;
+        } else if (totalWeight <= 2300) {
+            fwdLimit = 35.0 + ((totalWeight - 1500) / (2300 - 1500)) * (38.5 - 35.0);
+        } else {
+            fwdLimit = 38.5;
+        }
+
+        const totalBaggage = lbsBag1 + lbsBag2;
+
+        // Check C-172N limitations
+        const isTOWValid = totalWeight <= 2300.0;
+        const isCGValid = totalCG >= fwdLimit && totalCG <= 47.3;
+        const isBag1Valid = lbsBag1 <= 120.0;
+        const isBag2Valid = lbsBag2 <= 50.0;
+        const isTotalBagValid = totalBaggage <= 120.0;
+        const isSafe = isTOWValid && isCGValid && isBag1Valid && isBag2Valid && isTotalBagValid;
+
+        // Category determination (Utility vs Normal)
+        let category = "Normal Category";
+        if (totalWeight <= 2000 && lbsRear1 === 0 && lbsRear2 === 0 && totalBaggage === 0) {
+            category = "Utility Category";
+        }
+
+        // Update Status Card
+        const statusCard = document.getElementById('statusCard');
+        const statusText = document.getElementById('statusText');
+
+        if (isSafe) {
+            statusCard.className = 'status-card status-safe';
+            statusText.innerText = 'WEIGHT & CG WITHIN LIMITS';
+        } else {
+            statusCard.className = 'status-card status-danger';
+            if (!isTOWValid) {
+                statusText.innerText = 'OVERWEIGHT LIMIT';
+            } else if (!isCGValid) {
+                statusText.innerText = 'CG OUT OF LIMITS';
+            } else {
+                statusText.innerText = 'BAGGAGE EXCEEDED';
+            }
+        }
+
+        // Update Limits Table
+        document.getElementById('lim_tow_act').innerText = totalWeight.toFixed(1) + ' lbs';
+        document.getElementById('lim_fwd_val').innerText = fwdLimit.toFixed(2) + ' in';
+        document.getElementById('lim_fwd_act').innerText = totalCG.toFixed(2) + ' in';
+        document.getElementById('lim_aft_act').innerText = totalCG.toFixed(2) + ' in';
+        document.getElementById('lim_bag_act').innerText = totalBaggage.toFixed(1) + ' lbs';
+        document.getElementById('lim_category').innerText = category;
+
+        // Draw C-172N CG Envelope Chart
+        drawChart(totalCG, totalWeight, isSafe);
+    }
+
+    function drawChart(cg, weight, isSafe) {
+        const canvas = document.getElementById('cgCanvas');
+        if (!canvas.getContext) return;
+        const ctx = canvas.getContext('2d');
+
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "#fafafa";
+        ctx.fillRect(0, 0, width, height);
+
+        const minCG = 32.0, maxCG = 50.0;
+        const minW = 1400, maxW = 2500;
+
+        const padding = { left: 42, right: 15, top: 15, bottom: 26 };
+        const graphW = width - padding.left - padding.right;
+        const graphH = height - padding.top - padding.bottom;
+
+        function getX(cgVal) {
+            return padding.left + ((cgVal - minCG) / (maxCG - minCG)) * graphW;
+        }
+
+        function getY(wVal) {
+            return padding.top + (1 - (wVal - minW) / (maxW - minW)) * graphH;
+        }
+
+        // Draw grid lines
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 1;
+
+        for (let c = 34; c <= 48; c += 2) {
+            const x = getX(c);
+            ctx.beginPath();
+            ctx.moveTo(x, padding.top);
+            ctx.lineTo(x, height - padding.bottom);
+            ctx.stroke();
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "8.5px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(c, x, height - padding.bottom + 10);
+        }
+
+        for (let w = 1500; w <= 2400; w += 200) {
+            const y = getY(w);
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(width - padding.right, y);
+            ctx.stroke();
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "8.5px sans-serif";
+            ctx.textAlign = "right";
+            ctx.fillText(w, padding.left - 4, y + 3);
+        }
+
+        ctx.fillStyle = "#475569";
+        ctx.font = "bold 8.5px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Center of Gravity Arm (Inches Aft of Datum)", padding.left + graphW / 2, height - 3);
+
+        // Normal Category Polygon C-172N
+        const normalPoints = [
+            { cg: 35.0, w: 1500 },
+            { cg: 38.5, w: 2300 },
+            { cg: 47.3, w: 2300 },
+            { cg: 47.3, w: 1500 }
+        ];
+
+        // Utility Category Polygon C-172N
+        const utilityPoints = [
+            { cg: 35.0, w: 1500 },
+            { cg: 35.5, w: 2000 },
+            { cg: 40.5, w: 2000 },
+            { cg: 40.5, w: 1500 }
+        ];
+
+        // Fill Normal Category
+        ctx.beginPath();
+        ctx.moveTo(getX(normalPoints[0].cg), getY(normalPoints[0].w));
+        for (let i = 1; i < normalPoints.length; i++) {
+            ctx.lineTo(getX(normalPoints[i].cg), getY(normalPoints[i].w));
+        }
+        ctx.closePath();
+        ctx.fillStyle = "rgba(2, 132, 199, 0.12)";
+        ctx.fill();
+        ctx.strokeStyle = "#0284c7";
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        // Fill Utility Category
+        ctx.beginPath();
+        ctx.moveTo(getX(utilityPoints[0].cg), getY(utilityPoints[0].w));
+        for (let i = 1; i < utilityPoints.length; i++) {
+            ctx.lineTo(getX(utilityPoints[i].cg), getY(utilityPoints[i].w));
+        }
+        ctx.closePath();
+        ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+        ctx.fill();
+        ctx.strokeStyle = "#059669";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Legend
+        ctx.fillStyle = "#0284c7";
+        ctx.font = "bold 8px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("Normal", getX(42), getY(2220));
+
+        ctx.fillStyle = "#059669";
+        ctx.fillText("Utility", getX(36.5), getY(1900));
+
+        // Plot calculated load point
+        if (cg > 0 && weight > 0) {
+            const ptX = Math.max(padding.left, Math.min(width - padding.right, getX(cg)));
+            const ptY = Math.max(padding.top, Math.min(height - padding.bottom, getY(weight)));
+
+            ctx.beginPath();
+            ctx.arc(ptX, ptY, 5.5, 0, 2 * Math.PI);
+            ctx.fillStyle = isSafe ? "#16a34a" : "#dc2626";
+            ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = isSafe ? "#15803d" : "#b91c1c";
+            ctx.font = "bold 9px sans-serif";
+            ctx.textAlign = "left";
+            ctx.fillText(` (${cg.toFixed(2)}", ${weight.toFixed(0)} lbs)`, ptX + 7, ptY + 3);
+        }
+    }
+</script>
+</body>
+</html>
